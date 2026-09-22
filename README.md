@@ -83,3 +83,7 @@ python -m pytest
 - `POST /dashboards/:id/charts/` — `{chart_type, x_column, y_column, narrative?, x?, y?, width?, height?, z_index?}`; `x_column`/`y_column` validated against the dataset's schema
 - `PATCH /charts/:id/` — update any subset of chart fields (config or layout)
 - `DELETE /charts/:id/`
+
+## API (Milestone 4)
+
+- `GET /datasets/:id/suggest-chart-type/?x=col&y=col` — `{suggested_chart_type}` (`line`/`bar`/`scatter`/`pie`/`null`), a default only — chart creation accepts any `chart_type`. `y` is optional: a single `categorical` column alone suggests `pie` (count-only case)

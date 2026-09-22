@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .chart_suggestion import suggest_chart_type
 from .data_access import read_columns, read_preview
 from .jobs import parse_dataset
 from .models import Dataset
@@ -72,3 +73,23 @@ class DatasetDataView(_OwnedReadyDatasetMixin, APIView):
             raise ValidationError("'x' and 'y' must reference columns in the dataset's schema.")
 
         return Response(read_columns(dataset, x_column, y_column))
+
+
+class ChartTypeSuggestionView(_OwnedReadyDatasetMixin, APIView):
+    def get(self, request, id):
+        dataset = self.get_dataset()
+        valid_columns = {col["name"]: col["type"] for col in dataset.schema or []}
+
+        x_column = request.query_params.get("x")
+        y_column = request.query_params.get("y")
+
+        if not x_column:
+            raise ValidationError("The 'x' query parameter is required.")
+        if x_column not in valid_columns:
+            raise ValidationError("'x' must reference a column in the dataset's schema.")
+        if y_column is not None and y_column not in valid_columns:
+            raise ValidationError("'y' must reference a column in the dataset's schema.")
+
+        x_type = valid_columns[x_column]
+        y_type = valid_columns[y_column] if y_column else None
+        return Response({"suggested_chart_type": suggest_chart_type(x_type, y_type)})

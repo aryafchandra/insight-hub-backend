@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/pg_isready -h /tmp -p 5433)",
+      "Bash(/opt/homebrew/opt/redis/bin/redis-cli -p 6379 ping)",
+      "Bash(pkill -f \"manage.py runserver\")",
+      "Bash(pkill -f \"manage.py rqworker\")",
+      "Bash(rm -f .server.log .worker.log)",
+      "Bash(rm -rf media .pytest_cache)",
+      "Bash(rm -f /tmp/m3smoke.csv)",
+      "Bash(rm -f /tmp/m4smoke.csv /tmp/m4smoke2.csv)"
+    ]
+  }
+}

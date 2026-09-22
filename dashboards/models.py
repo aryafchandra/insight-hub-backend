@@ -1,6 +1,7 @@
 import uuid
 
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from datasets.models import Dataset
@@ -39,8 +40,8 @@ class Chart(models.Model):
     narrative = models.TextField(null=True, blank=True)
     x = models.FloatField(default=0)
     y = models.FloatField(default=0)
-    width = models.FloatField(default=400)
-    height = models.FloatField(default=300)
+    width = models.FloatField(default=400, validators=[MinValueValidator(0.01)])
+    height = models.FloatField(default=300, validators=[MinValueValidator(0.01)])
     z_index = models.IntegerField(default=0)
 
     def __str__(self):
