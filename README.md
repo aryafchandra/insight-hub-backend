@@ -70,3 +70,16 @@ python -m pytest
 - `POST /datasets/` — multipart `{name, raw_file}`, auth required → `{id, status: pending}`
 - `GET /datasets/` — list the requesting user's datasets
 - `GET /datasets/:id/` — status + (once ready) schema/row_count, or failure_reason if failed; 404 if not owned
+
+## API (Milestone 2)
+
+- `GET /datasets/:id/preview/` — first 20 rows as records; 400 if dataset isn't `ready`
+- `GET /datasets/:id/data/?x=col&y=col` — resolved `[{x, y}, ...]` points for the two requested columns; 400 if columns aren't in the schema or dataset isn't `ready`
+- `POST /dashboards/` — `{title, dataset}`; `dataset` must be owned by the requester and `status == 'ready'`
+- `GET /dashboards/` — list the requesting user's dashboards
+- `GET /dashboards/:id/` — full dashboard incl. nested `charts`
+- `PATCH /dashboards/:id/` — update `title`
+- `DELETE /dashboards/:id/`
+- `POST /dashboards/:id/charts/` — `{chart_type, x_column, y_column, narrative?, x?, y?, width?, height?, z_index?}`; `x_column`/`y_column` validated against the dataset's schema
+- `PATCH /charts/:id/` — update any subset of chart fields (config or layout)
+- `DELETE /charts/:id/`

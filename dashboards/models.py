@@ -1,0 +1,47 @@
+import uuid
+
+from django.conf import settings
+from django.db import models
+
+from datasets.models import Dataset
+
+
+class Dashboard(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="dashboards"
+    )
+    dataset = models.ForeignKey(
+        Dataset, on_delete=models.PROTECT, related_name="dashboards"
+    )
+    title = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Chart(models.Model):
+    class ChartType(models.TextChoices):
+        LINE = "line", "Line"
+        BAR = "bar", "Bar"
+        PIE = "pie", "Pie"
+        SCATTER = "scatter", "Scatter"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    dashboard = models.ForeignKey(
+        Dashboard, on_delete=models.CASCADE, related_name="charts"
+    )
+    chart_type = models.CharField(max_length=20, choices=ChartType.choices)
+    x_column = models.CharField(max_length=255)
+    y_column = models.CharField(max_length=255)
+    narrative = models.TextField(null=True, blank=True)
+    x = models.FloatField(default=0)
+    y = models.FloatField(default=0)
+    width = models.FloatField(default=400)
+    height = models.FloatField(default=300)
+    z_index = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.chart_type} ({self.x_column} / {self.y_column})"
