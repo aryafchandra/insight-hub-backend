@@ -1,0 +1,13 @@
+.venv/
+.pgdata/
+.redisdata/
+.env
+.server.log
+.worker.log
+__pycache__/
+*.pyc
+db.sqlite3
+media/
+*.egg-info/
+.pytest_cache/
+.DS_Store
