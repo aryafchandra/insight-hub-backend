@@ -32,6 +32,7 @@ Read the relevant doc before starting work on a milestone. Don't re-derive archi
 - Ownership checks belong on every endpoint that touches user-owned data (`Dataset`, `Dashboard`, `Chart`) — this was called out explicitly per-ticket in `engineering-tickets.md` rather than handled once globally, because it's easy to forget per-endpoint. Keep doing that.
 - Acceptance criteria in the tickets/spec docs are the test cases. When implementing a ticket, check the work against its acceptance criteria explicitly before considering it done.
 - Work one ticket at a time, in the milestone order given. Don't jump ahead to a later milestone's ticket even if it seems related.
+- **Write code like a junior dev, at senior dev quality.** Explicit and boring over clever: no one-liners that pack multiple things together, no cute abstractions, no metaprogramming, obvious control flow (plain `if`/`for` over comprehension chains or reflection). But underneath that plainness, hold the senior-dev bar — correct edge-case handling, real test coverage, no skipped validation. A reviewer skimming the diff should never have to stop and figure out a trick; the code should read the way it was reasoned through, not the way it was compressed.
 
 ## Open questions (not yet decided — ask before assuming)
 

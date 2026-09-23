@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
+from datasets.data_access import read_columns
 from datasets.models import Dataset
 
-from .models import Chart, Dashboard
+from .models import Chart, Dashboard, ShareLink
 
 
 class ChartSerializer(serializers.ModelSerializer):
@@ -79,3 +80,47 @@ class DashboardCreateSerializer(serializers.ModelSerializer):
                 "Dataset must be fully processed (status='ready') before it can back a dashboard."
             )
         return dataset
+
+
+class ShareLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShareLink
+        fields = ["token", "created_at"]
+
+
+class PublicChartSerializer(serializers.ModelSerializer):
+    data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Chart
+        fields = [
+            "id",
+            "chart_type",
+            "x_column",
+            "y_column",
+            "narrative",
+            "x",
+            "y",
+            "width",
+            "height",
+            "z_index",
+            "data",
+        ]
+
+    def get_data(self, chart):
+        dataset = self.context["dataset"]
+        return read_columns(dataset, chart.x_column, chart.y_column)
+
+
+class PublicDashboardSerializer(serializers.ModelSerializer):
+    charts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Dashboard
+        fields = ["id", "title", "charts", "created_at"]
+
+    def get_charts(self, dashboard):
+        serializer = PublicChartSerializer(
+            dashboard.charts.all(), many=True, context={"dataset": dashboard.dataset}
+        )
+        return serializer.data

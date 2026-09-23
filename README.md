@@ -87,3 +87,15 @@ python -m pytest
 ## API (Milestone 4)
 
 - `GET /datasets/:id/suggest-chart-type/?x=col&y=col` — `{suggested_chart_type}` (`line`/`bar`/`scatter`/`pie`/`null`), a default only — chart creation accepts any `chart_type`. `y` is optional: a single `categorical` column alone suggests `pie` (count-only case)
+
+## API (Milestone 5)
+
+- `POST /dashboards/:id/share/` — creates (or returns the existing active) `ShareLink`; `{token, created_at}`, 201 if newly created else 200
+- `POST /dashboards/:id/share/regenerate/` — revokes the current active token and issues a new one; `{token, created_at}`, 201
+- `GET /public/dashboards/:token/` — unauthenticated, read-only; `{id, title, created_at, charts: [{..., data: [{x, y}, ...]}]}`. Invalid or revoked token → 404 (never 403, and both cases are indistinguishable). Never exposes the underlying `raw_file`/CSV — only resolved per-chart `{x, y}` points
+
+## API (Milestone 6)
+
+- `DELETE /datasets/:id/` — soft delete: flags `deleted_at` instead of removing the row. Existing dashboards built on the dataset keep working; it just disappears from the owner's dataset list/detail and can't back a *new* dashboard
+- `DELETE /dashboards/:id/` — soft delete, same as above. Also takes its charts (via `/charts/:id/`) and any active share link (`/public/dashboards/:token/`) out of resolution immediately
+- `GET /dashboards/:id/export/` — owner-only; downloads the dashboard's underlying CSV as-is (`Content-Disposition: attachment`)

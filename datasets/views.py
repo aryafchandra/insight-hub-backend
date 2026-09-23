@@ -1,4 +1,5 @@
 import django_rq
+from django.utils import timezone
 from rest_framework import generics, permissions
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
@@ -27,7 +28,7 @@ class DatasetListCreateView(generics.ListCreateAPIView):
         django_rq.get_queue("default").enqueue(parse_dataset, dataset.id)
 
 
-class DatasetDetailView(generics.RetrieveAPIView):
+class DatasetDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = DatasetDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
@@ -38,6 +39,14 @@ class DatasetDetailView(generics.RetrieveAPIView):
         # 404s rather than 403ing (don't leak existence — see CLAUDE.md
         # convention applied elsewhere to share links).
         return Dataset.objects.filter(owner=self.request.user)
+
+    def perform_destroy(self, instance):
+        # Soft delete: flag the row instead of removing it, so it's
+        # recoverable for a grace period (TICKET-601). Existing dashboards
+        # built on this dataset keep working — only the owner's dataset
+        # list/detail and new-dashboard creation stop seeing it.
+        instance.deleted_at = timezone.now()
+        instance.save(update_fields=["deleted_at"])
 
 
 class _OwnedReadyDatasetMixin:

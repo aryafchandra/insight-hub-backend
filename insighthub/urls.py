@@ -7,4 +7,5 @@ urlpatterns = [
     path("datasets/", include("datasets.urls")),
     path("dashboards/", include("dashboards.urls")),
     path("charts/", include("dashboards.chart_urls")),
+    path("public/dashboards/", include("dashboards.public_urls")),
 ]
